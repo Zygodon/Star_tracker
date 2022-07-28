@@ -3,7 +3,7 @@
 # Pololu Micro Metal Motor 380:1 reduction with quadrature
 # (two output) shaft encoder.
 # R Pi Pico using two counters, counting both rising and falling edges.
-# Parameters optimised 2022-07-18, Zeigler - Nicholls tuning.
+# Parameters optimised 2022-07-27, Zeigler - Nicholls tuning.
 
 from machine import Pin,Timer, PWM
 from rp2 import PIO, asm_pio, StateMachine
@@ -70,9 +70,9 @@ controller.duty_u16(duty_cycle)
 set_point = 0.85 # Chosen 2022-07-20 to give 1 turn of drive screw in 1 min 18.5s
 
 # PID parameters
-Kp = 120 # Ku = 200; Tu = 17
-Ki = 14
-Kd = 255
+Kp = 1920 # Ku = 3200; Tu = 5
+Ki = 768
+Kd = 1200
 dt = 50 # ms sampling period
 
 A0 = Kp*dt + Ki*dt + Kd/dt
