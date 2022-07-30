@@ -3,14 +3,14 @@
 # Pololu Micro Metal Motor 380:1 reduction with quadrature
 # (two output) shaft encoder.
 # R Pi Pico using two counters, counting both rising and falling edges.
-# Parameters optimised 2022-07-27, Zeigler - Nicholls tuning.
+# Parameters optimised 2022-07-30, Zeigler - Nicholls tuning.
 
 from machine import Pin,Timer, PWM
 from rp2 import PIO, asm_pio, StateMachine
 import utime
 
-DUTY_CYCLE_UPPER = 65535
-DUTY_CYCLE_LOWER = 1000
+DUTY_CYCLE_UPPER = 65000
+DUTY_CYCLE_LOWER = 2000
 
 COUNTER_SCALE = 490 # Empirical value
 
@@ -55,6 +55,7 @@ class SMCounter:
 counter_A = SMCounter(smID=0,InputPin=Pin(16,Pin.IN,Pin.PULL_UP))
 counter_B = SMCounter(smID=0,InputPin=Pin(17,Pin.IN,Pin.PULL_UP))
 
+led = machine.Pin(25, machine.Pin.OUT)
 # L298N terminals IN1, IN2
 IN1 = Pin(3, Pin.OUT)
 IN2 = Pin(2, Pin.OUT)
@@ -67,12 +68,12 @@ controller.freq(1000) # PWM basic frequency cycles/second
 duty_cycle = DUTY_CYCLE_LOWER
 controller.duty_u16(duty_cycle)
 
-set_point = 0.85 # Chosen 2022-07-20 to give 1 turn of drive screw in 1 min 18.5s
+set_point = 0.673 # One revolution of screw in 79.0 s
 
 # PID parameters
-Kp = 1920 # Ku = 3200; Tu = 5
-Ki = 768
-Kd = 1200
+Kp = 720 # Ku = 1200; Tu = 5
+Ki = 288 
+Kd = 480
 dt = 50 # ms sampling period
 
 A0 = Kp*dt + Ki*dt + Kd/dt
@@ -81,6 +82,7 @@ A2 = Kd/dt
 
 error = [0, 0, 0]
 
+led.value(1)
 while True:
     error[2] = error[1]
     error[1] = error[0]
